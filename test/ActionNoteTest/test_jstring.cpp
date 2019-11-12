@@ -3,7 +3,7 @@
 
 using namespace handy::action_note;
 
-TEST(SString, DoesEQUALITY) {
+TEST(jstring, DoesEQUALITY) {
   jstring control("Control");
   jstring notControl("Not control");
   jstring otherControl("Control");
@@ -11,7 +11,7 @@ TEST(SString, DoesEQUALITY) {
   ASSERT_FALSE(control.equals(notControl));
 }
 
-TEST(SString, DoesCONTAINS){
+TEST(jstring, DoesCONTAINS){
   jstring control("Control");
   jstring notControl("Not control");
   jstring otherControl("control");
@@ -22,7 +22,7 @@ TEST(SString, DoesCONTAINS){
   ASSERT_FALSE(defNotControl.contains(otherControl));
 }
 
-TEST(SString, DoesEMPTY){
+TEST(jstring, DoesEMPTY){
 	jstring empty("");
 	jstring notEmpty("not");
 
@@ -30,7 +30,7 @@ TEST(SString, DoesEMPTY){
   ASSERT_FALSE(notEmpty.empty());
 }
 
-TEST(SString, DoesSPLIT){
+TEST(jstring, DoesSPLIT){
 	jstring base("This is my super awesome base string");
 	jstring nullDelim("NULL");
 	jstring white(" ");

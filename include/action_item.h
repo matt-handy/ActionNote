@@ -13,7 +13,7 @@ namespace handy{
 		const string ACTION_START_TAG = "@@start ";
 		const string ACTION_DUE_TAG = "@@due ";
 		const string ACTION_NOTE_TAG = "@@note ";
-		const string ACTION_END_TAG = "@@end_AI";
+		const string ACTION_END_TAG = "@@endAI";
 
 		class action_item : virtual public meeting_element {
 		private:
@@ -28,6 +28,14 @@ namespace handy{
 				due_date = a_due_date;
 				start_date = a_start_date;
 				action_text = a_action_text;
+			}
+
+			action_item(const action_item& other) {
+				assignee = other.assignee;
+				due_date = other.due_date;
+				start_date = other.due_date;
+				action_text = other.due_date;
+				notes = other.notes;
 			}
 
 			string render_text();

@@ -11,6 +11,10 @@ namespace handy{
 		class jstring {
 
 		public:
+			jstring(const char* value) {
+				init((char *)value, strlen(value));
+			}
+
 			jstring(char* value) {
 				init(value, strlen(value));
 			}

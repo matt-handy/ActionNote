@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "../../include/action_item.h"
+#include "../../include/jstring.h"
 
 using namespace handy::action_note;
 
@@ -20,4 +21,16 @@ TEST(TestCaseName, TestName) {
 	EXPECT_EQ(*notes_itr, "12/13/2019 - I prepared to do the thing");
 	notes_itr++;
 	EXPECT_EQ(*notes_itr, "12/14/2019 - I started to do the thing");
+
+	string value = test_ai.render_text();
+	jstring jvalue = jstring(value.c_str());
+	vector<jstring> lines = jvalue.split(jstring(LINE_RETURN.c_str()));
+	EXPECT_EQ(lines.size(), 5);
+
+	EXPECT_TRUE(lines.at(0).equals("@@AI myself @@start 12/14/2019 @@due 12/15/2019"));
+	EXPECT_TRUE(lines.at(1).equals("DO ALL OF THE THINGS"));
+	EXPECT_TRUE(lines.at(2).equals("@@note 12/13/2019 - I prepared to do the thing"));
+	EXPECT_TRUE(lines.at(3).equals("@@note 12/14/2019 - I started to do the thing"));
+	EXPECT_TRUE(lines.at(4).equals("@@endAI"));
+
 }
