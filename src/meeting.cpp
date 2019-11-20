@@ -23,7 +23,7 @@ void meeting::to_file(string filename) {
 			myfile << ", ";
 		}
 		myfile << *a_iter;
-		a_iter++;
+		advance(a_iter, 1);
 	}
 
 	myfile << LINE_RETURN;
@@ -33,14 +33,15 @@ void meeting::to_file(string filename) {
 		string element = (*e_iter)->render_text();
 		myfile << element;
 		
-		e_iter++;
+		advance(e_iter, 1);
 	}
 
 	myfile.close();
 }
 
-meeting meeting::from_file(string filename) {
-	meeting meeting;
+meeting* meeting::from_file(string filename) {
+	meeting* meeting = new handy::action_note::meeting();
+	meeting->original_file = filename;
 	string line;
 	ifstream myfile(filename);
 	string current_segment;
@@ -49,6 +50,7 @@ meeting meeting::from_file(string filename) {
 	string curr_ai_start;
 	string curr_ai_due;
 	string curr_ai_text;
+	string curr_ai_enddate;
 	vector<string> ai_notes;
 
 	if (myfile.is_open())
@@ -66,11 +68,16 @@ meeting meeting::from_file(string filename) {
 				jstring splitter = jstring((char*)", ");
 				std::vector<jstring> attendee_v = str.split(splitter);
 				for (vector <jstring> ::iterator it = attendee_v.begin(); it != attendee_v.end(); ++it) {
-					meeting.attendees.push_back(it->c_str());
+					meeting->attendees.push_back(it->c_str());
 				}
 			}
 			else if (in_action) {
-				if (line.find(ACTION_NOTE_TAG) != std::string::npos) {
+				if (line.find(ACTION_CLOSED_TAG) != std::string::npos) {
+#ifdef DEBUG
+					cout << "Pushing closed tag!" << endl;
+#endif
+					curr_ai_enddate = line.substr(ACTION_CLOSED_TAG.size());
+				}else if (line.find(ACTION_NOTE_TAG) != std::string::npos) {
 #ifdef DEBUG
 					cout << "Pushing note!" << endl;
 #endif
@@ -83,15 +90,20 @@ meeting meeting::from_file(string filename) {
 #endif
 					in_action_text = false;
 					in_action = false;
-					action_item* ai = new action_item(curr_ai_assignee, curr_ai_start, curr_ai_due, curr_ai_text);
+					action_item* ai = new action_item(curr_ai_assignee, curr_ai_start, curr_ai_due, curr_ai_text, curr_ai_enddate, meeting);
+#ifdef DEBUG
+					cout << "AI: " << ai << endl;
+#endif
 					for (int idx = 0; idx < ai_notes.size(); idx++) {
 						ai->add_note(ai_notes.at(idx));
 					}
-					meeting.elements.push_back(ai);
+					meeting->elements.push_back(ai);
+					meeting->actions.push_back(ai);
 
 					curr_ai_assignee = "";
 					curr_ai_due = "";
 					curr_ai_start = "";
+					curr_ai_enddate = "";
 					curr_ai_text = "";
 					ai_notes.clear();
 				}
@@ -114,7 +126,7 @@ meeting meeting::from_file(string filename) {
 				cout << "Found action tag: " << line << endl;
 #endif
 				if (current_segment.size() != 0) {
-					meeting.elements.push_back(new meeting_text(current_segment));
+					meeting->elements.push_back(new meeting_text(current_segment));
 					current_segment = "";
 				}
 				in_action = true;
@@ -154,7 +166,7 @@ meeting meeting::from_file(string filename) {
 		}
 		myfile.close();
 		if (current_segment.size() != 0) {
-			meeting.elements.push_back(new meeting_text(current_segment));
+			meeting->elements.push_back(new meeting_text(current_segment));
 		}
 	}
 

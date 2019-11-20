@@ -1,0 +1,3 @@
+C:/Users/matte/OneDrive/Documents/Software/ActionNote/CMakeFiles/action_note.dir
+C:/Users/matte/OneDrive/Documents/Software/ActionNote/CMakeFiles/ALL_BUILD.dir
+C:/Users/matte/OneDrive/Documents/Software/ActionNote/CMakeFiles/ZERO_CHECK.dir

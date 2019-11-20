@@ -26,6 +26,10 @@ string action_item::render_text() {
 		}
 	}
 
+	if (closed_date.size() != 0) {
+		output << ACTION_CLOSED_TAG << closed_date << LINE_RETURN;
+	}
+
 	output << ACTION_END_TAG << LINE_RETURN;
 
 	return output.str();

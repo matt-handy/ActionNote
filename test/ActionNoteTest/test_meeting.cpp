@@ -5,9 +5,9 @@
 using namespace handy::action_note;
 
 TEST(meeting, DoesLoadAttendeeTest) {
-	meeting test_meeting = meeting::from_file("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting-2019-09-13.txt");
-	EXPECT_EQ(test_meeting.get_attendees().size(), 3);
-	list<string> attendees = test_meeting.get_attendees();
+	meeting* test_meeting = meeting::from_file("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting-2019-09-13.txt");
+	EXPECT_EQ(test_meeting->get_attendees().size(), 3);
+	list<string> attendees = test_meeting->get_attendees();
 	list<string>::iterator attendee_itr = attendees.begin();
 	EXPECT_EQ(*attendee_itr, "That one");
 	attendee_itr++;
@@ -17,11 +17,11 @@ TEST(meeting, DoesLoadAttendeeTest) {
 }
 
 TEST(meeting, DoesLoadAiTest) {
-	meeting test_meeting = meeting::from_file("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting-2019-09-13.txt");
-	list<meeting_element*> elements = test_meeting.get_elements();
+	meeting* test_meeting = meeting::from_file("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting-2019-09-13.txt");
+	list<meeting_element*> elements = test_meeting->get_elements();
 	list<meeting_element *>::iterator element_itr = elements.begin();
 	
-	EXPECT_EQ(test_meeting.get_elements().size(), 5);
+	EXPECT_EQ(test_meeting->get_elements().size(), 5);
 
 	string first_canon = "This is a test dataset";
 	first_canon.append(LINE_RETURN);
@@ -87,8 +87,8 @@ TEST(meeting, DoesLoadAiTest) {
 }
 
 TEST(meeting, DoesWriteTest) {
-	meeting test_meeting = meeting::from_file("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting-2019-09-13.txt");
-	test_meeting.to_file("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting-2019-09-13-wb.txt");
+	meeting* test_meeting = meeting::from_file("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting-2019-09-13.txt");
+	test_meeting->to_file("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting-2019-09-13-wb.txt");
 
 	ifstream canon("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting-2019-09-13.txt");
 	ifstream rewrite("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting-2019-09-13-wb.txt");
@@ -107,3 +107,26 @@ TEST(meeting, DoesWriteTest) {
 	canon.close();
 	rewrite.close();
 }
+
+TEST(meeting, DoesWriteTestActionClosed) {
+	meeting* test_meeting = meeting::from_file("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting-2019-09-10.txt");
+	test_meeting->to_file("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting-2019-09-10-wb.txt");
+
+	ifstream canon("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting-2019-09-10.txt");
+	ifstream rewrite("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting-2019-09-10-wb.txt");
+
+	EXPECT_TRUE(canon.is_open());
+	EXPECT_TRUE(rewrite.is_open());
+
+	string cline;
+	string rline;
+
+	while (getline(canon, cline) && getline(rewrite, rline))
+	{
+		EXPECT_EQ(cline, rline);
+	}
+
+	canon.close();
+	rewrite.close();
+}
+
