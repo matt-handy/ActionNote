@@ -13,7 +13,7 @@ namespace fs = std::filesystem;
 void meeting_manager::initialize() {
 	for (auto& p : fs::directory_iterator(dir)){
 		//Assume that only files with extensions are valid meetings
-		if (p.path().has_extension()) {
+		if (p.path().extension().generic_string().find("mt") != string::npos) {
 #ifdef DEBUG
 			cout << p.path().string() << endl;
 #endif
@@ -23,6 +23,10 @@ void meeting_manager::initialize() {
 #endif
 			meetings.push_back(read_meeting);
 		}
+		else if (p.path().extension().generic_string().find("note") != string::npos) {
+			action_item* ai = action_item::get_action_item(p.path().string());
+			free_actions.push_back(ai);
+		}
 	}
 #ifdef DEBUG
 	cout << "Ingest complete" << endl;
@@ -31,6 +35,14 @@ void meeting_manager::initialize() {
 
 vector<action_item*> meeting_manager::get_open_actions() {
 	vector<action_item*> actions;
+
+	for (int idx = 0; idx < free_actions.size(); idx++) {
+		action_item* ai = free_actions.at(idx);
+		if (ai->get_closed_date().size() == 0) {
+			actions.push_back(ai);
+		}
+	}
+
 	for (int idx = 0; idx < meetings.size(); idx++) {
 		meeting* meeting = meetings.at(idx);
 #ifdef DEBUG
@@ -75,7 +87,7 @@ bool meeting_manager::save_action(action_item* action) {
 		return true;
 	}
 	else {
-		return false;
+		return action->save();
 	}
 }
 
@@ -89,7 +101,7 @@ bool meeting_manager::addActionNote(string note, int openActionIdx) {
 	char buffer[80];
 	time(&rawtime);
 	timeinfo = localtime(&rawtime);
-	strftime(buffer, 80, "%m/%d/%Y", timeinfo);
+	strftime(buffer, 80, "%Y-%m-%d", timeinfo);
 
 	string a_note = buffer;
 	a_note.append(" ");

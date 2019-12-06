@@ -27,6 +27,7 @@ namespace handy{
 			string closed_date;
 			list<string> notes;
 			meeting* parent;
+			string file;
 
 		public:
 			action_item(string a_assignee, string a_start_date, string a_due_date, string a_action_text, string a_closed_date, meeting* a_parent) {
@@ -48,7 +49,21 @@ namespace handy{
 				parent = other.parent;
 			}
 
+			static action_item* get_action_item(string first_line, ifstream* stream, meeting* parent);
+			static action_item* get_action_item(string filename);
+
+			bool save();
+			bool save_as(string filename);
+
 			virtual string render_text();
+
+			inline void set_filename(string filename) {
+				file = filename;
+			}
+
+			inline string get_filename() {
+				return file;
+			}
 
 			inline string get_assignee() {
 				return assignee;

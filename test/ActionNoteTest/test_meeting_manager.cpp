@@ -5,7 +5,7 @@
 using namespace handy::action_note;
 
 TEST(meeting_manager, DoesAddNote) {
-	std::filesystem::remove("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_writeback\\meeting-2019-09-13-mod.txt");
+	std::filesystem::remove("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_writeback\\meeting-2019-09-13-mod.mt");
 	meeting_manager my_man("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_writeback");
 	my_man.initialize();
 	my_man.addActionNote("Adding another note!", 0);
@@ -23,14 +23,14 @@ TEST(meeting_manager, DoesAddNote) {
 }
 
 TEST(meeting_manager, DoesWriteBackAction) {
-	std::filesystem::remove("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_writeback\\meeting-2019-09-13-mod.txt");
-	std::filesystem::copy("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_writeback\\meeting-2019-09-13-orig.txt", 
-		"C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_writeback\\meeting-2019-09-13-mod.txt");
+	std::filesystem::remove("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_writeback\\meeting-2019-09-13-mod.mt");
+	std::filesystem::copy("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_writeback\\meeting-2019-09-13-orig.mt", 
+		"C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_writeback\\meeting-2019-09-13-mod.mt");
 	meeting_manager my_man("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_writeback");
 	my_man.initialize();
 	vector<action_item*> open_actions = my_man.get_open_actions();
 	
-	EXPECT_EQ(open_actions.at(0)->get_parent_meeting()->get_original_file(), "C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_writeback\\meeting-2019-09-13-mod.txt");
+	EXPECT_EQ(open_actions.at(0)->get_parent_meeting()->get_original_file(), "C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_writeback\\meeting-2019-09-13-mod.mt");
 	open_actions.at(0)->add_note("10/29/29 WOAH, shoulda dont this years ago!!!");
 	my_man.save_action(open_actions.at(0));
 
@@ -61,4 +61,38 @@ TEST(meeting_manager, DoesLoadOpenActions) {
 	ASSERT_EQ(third->get_notes().size(), 0);
 	ASSERT_EQ(third->get_action_text(), "TAKE RANDOM ACTION");
 	
+}
+
+TEST(meeting_manager, DoesLoadOpenActionsFromActionNotes) {
+	meeting_manager my_man("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_actions");
+	my_man.initialize();
+	vector<action_item*> open_actions = my_man.get_open_actions();
+	ASSERT_EQ(open_actions.size(), 4);
+
+	action_item* first = open_actions.at(0);
+	ASSERT_EQ(first->get_closed_date().size(), 0);
+	ASSERT_EQ(first->get_notes().size(), 2);
+	ASSERT_EQ(first->get_notes().front(), "2019-12-07 I did stuff");
+	ASSERT_EQ(first->get_notes().back(), "2019-12-08 I thought about doing stuff");
+	ASSERT_EQ(first->get_action_text(), "Here be an action!");
+}
+
+TEST(meeting_manager, DoesWriteBackActionNote) {
+	std::filesystem::remove("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_actions_writeback\\actionnote-2019-12-06.note");
+	std::filesystem::copy("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_actions_writeback\\actionnote-2019-12-06-orig.note",
+		"C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_actions_writeback\\actionnote-2019-12-06.note");
+	meeting_manager my_man("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_actions_writeback");
+	my_man.initialize();
+	vector<action_item*> open_actions = my_man.get_open_actions();
+
+	EXPECT_EQ(open_actions.size(), 5);
+	action_item* ai = open_actions.at(1);
+	EXPECT_EQ(ai->get_parent_meeting(), (meeting*)NULL);
+	EXPECT_EQ(ai->get_filename(), "C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_actions_writeback\\actionnote-2019-12-06.note");
+
+	my_man.addActionNote("Noted a thing!!!", 1);
+	EXPECT_TRUE(my_man.save_action(ai));
+
+	action_item* reloaded_ai = action_item::get_action_item("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_actions_writeback\\actionnote-2019-12-06.note");
+	EXPECT_TRUE(reloaded_ai->get_notes().size(), 3);
 }

@@ -27,13 +27,14 @@ namespace handy {
 			void save_meeting(meeting* meeting);
 
 			//Saves action item changes
-			bool save_action(action_item* meeting);
+			bool save_action(action_item* action_item);
 
 			bool addActionNote(string note, int openActionIdx);
 		private:
 			string dir;
 
 			vector<meeting*> meetings;
+			vector<action_item*> free_actions;
 
 		};
 	}
