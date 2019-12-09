@@ -30,6 +30,8 @@ namespace handy {
 			bool save_action(action_item* action_item);
 
 			bool addActionNote(string note, int openActionIdx);
+
+			void create_action_note(string mnemonic, string actionee, string due_date, string start_date, string note);
 		private:
 			string dir;
 

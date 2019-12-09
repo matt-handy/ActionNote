@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "../../include/meeting_manager.h"
+#include "../../include/timeutil.h"
 #include <filesystem>
 
 using namespace handy::action_note;
@@ -94,5 +95,23 @@ TEST(meeting_manager, DoesWriteBackActionNote) {
 	EXPECT_TRUE(my_man.save_action(ai));
 
 	action_item* reloaded_ai = action_item::get_action_item("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager_actions_writeback\\actionnote-2019-12-06.note");
-	EXPECT_TRUE(reloaded_ai->get_notes().size(), 3);
+	EXPECT_EQ(reloaded_ai->get_notes().size(), 3);
+}
+
+TEST(meeting_manager, DoesCreateNewActionNote) {
+	string basedir = "C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager";
+	meeting_manager my_man(basedir);
+	my_man.initialize();
+	my_man.create_action_note("test_creator", "myself", "2019-12-12", "2019-12-08", "This is an action I'm creating to testing stuff");
+
+	string newFileName = basedir;
+	newFileName.append(PATH_SEP);
+	newFileName.append("test_creator");
+	newFileName.append(timeutil::get_YYYYMMDD_current());
+	newFileName.append(".note");
+
+	EXPECT_TRUE(filesystem::exists(newFileName));
+	EXPECT_TRUE(my_man.get_open_actions().size() == 4);
+
+	std::filesystem::remove(newFileName);
 }

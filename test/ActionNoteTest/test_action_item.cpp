@@ -79,6 +79,8 @@ TEST(action_item, StandAloneActionWrite) {
 	EXPECT_TRUE(ai != NULL);
 
 	ai->save_as("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\actionnote-2019-12-06-wb.note");
+	delete ai;
+	ai = action_item::get_action_item("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\actionnote-2019-12-06.note");
 
 	ifstream canon("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\actionnote-2019-12-06.note");
 	ifstream rewrite("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\actionnote-2019-12-06-wb.note");

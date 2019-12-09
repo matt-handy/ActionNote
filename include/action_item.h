@@ -1,8 +1,11 @@
 #pragma once
 
 #include "meeting_element.h";
+#include "timeutil.h";
 #include <list>;
 #include <string>;
+
+
 
 using namespace std;
 
@@ -57,6 +60,10 @@ namespace handy{
 
 			virtual string render_text();
 
+			inline void close_action() {
+				closed_date = timeutil::get_YYYYMMDD_current();
+			}
+
 			inline void set_filename(string filename) {
 				file = filename;
 			}
@@ -90,6 +97,10 @@ namespace handy{
 			}
 
 			inline void add_note(string new_note) {
+				string a_note = timeutil::get_YYYYMMDD_current();
+				a_note.append(" ");
+				a_note.append(new_note);
+
 				notes.push_back(new_note);
 			}
 
@@ -102,6 +113,7 @@ namespace handy{
 					std::list<string>::iterator ptr = notes.begin();
 					advance(ptr, idx);
 					notes.erase(ptr);
+					return true;
 				}
 				else {
 					return false;

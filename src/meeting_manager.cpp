@@ -1,4 +1,5 @@
 #include "meeting_manager.h"
+#include "timeutil.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -96,17 +97,19 @@ bool meeting_manager::addActionNote(string note, int openActionIdx) {
 		return false;
 	}
 
-	time_t rawtime;
-	struct tm* timeinfo;
-	char buffer[80];
-	time(&rawtime);
-	timeinfo = localtime(&rawtime);
-	strftime(buffer, 80, "%Y-%m-%d", timeinfo);
-
-	string a_note = buffer;
-	a_note.append(" ");
-	a_note.append(note);
-
-	get_open_actions().at(openActionIdx)->add_note(a_note);
+	get_open_actions().at(openActionIdx)->add_note(note);
 	return save_action(get_open_actions().at(openActionIdx));
+}
+
+void meeting_manager::create_action_note(string mnemonic, string actionee, string due_date, string start_date, string note) {
+	
+
+	action_item* ai = new action_item(actionee, start_date, due_date, note, string(), NULL);
+	string newFileName = dir;
+	newFileName.append(PATH_SEP);
+	newFileName.append(mnemonic);
+	newFileName.append(timeutil::get_YYYYMMDD_current());
+	newFileName.append(".note");
+	ai->save_as(newFileName);
+	free_actions.push_back(ai);
 }

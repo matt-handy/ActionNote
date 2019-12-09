@@ -15,6 +15,8 @@ bool action_item::save_as(string filename) {
 	myfile << render_text();
 
 	myfile.close();
+	file = filename;
+	return true;
 }
 
 bool action_item::save() {
@@ -124,6 +126,7 @@ action_item* action_item::get_action_item(string line, ifstream* stream, meeting
 			ai_notes.push_back(line.substr(ACTION_NOTE_TAG.size()));
 		}
 	}
+	return NULL;
 }
 
 string action_item::render_text() {
