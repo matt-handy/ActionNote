@@ -9,6 +9,7 @@ using namespace handy;
 using namespace handy::action_note;
 
 void meeting::to_file(string filename) {
+	original_file = filename;
 	ofstream myfile;
 	myfile.open(filename);
 	

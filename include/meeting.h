@@ -14,12 +14,21 @@ namespace handy{
 		public: 
 			void to_file(string filename);
 			static meeting* from_file(string filename);
+
+			inline void add_attendee(string name) {
+				attendees.push_back(name);
+			}
 			inline list<string> get_attendees() {
 				return attendees;
+			}
+
+			inline void add_element(meeting_element* element) {
+				elements.push_back(element);
 			}
 			inline list<meeting_element*> get_elements() {
 				return elements;
 			}
+
 			inline list<action_item*> get_actions() {
 				return actions;
 			}

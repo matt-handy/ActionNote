@@ -11,6 +11,20 @@ using namespace std;
 using namespace handy::action_note;
 namespace fs = std::filesystem;
 
+bool meeting_manager::saveas_meeting(string meeting_name, meeting* meeting) {
+	string filename = dir;
+	filename.append(PATH_SEP);
+	string timestamp = timeutil::get_YYYYMMDD_current();
+	filename.append(meeting_name);
+	filename.append(timestamp);
+	filename.append(".mt");
+	meeting->to_file(filename);
+
+	meetings.push_back(meeting);
+
+	return true;
+}
+
 void meeting_manager::initialize() {
 	for (auto& p : fs::directory_iterator(dir)){
 		//Assume that only files with extensions are valid meetings

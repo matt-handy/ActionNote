@@ -68,7 +68,11 @@ TEST(action_item, StandAloneActionRead) {
 	EXPECT_EQ(ai->get_due_date(), "2020-12-31");
 	EXPECT_EQ(ai->get_closed_date(), "");
 	EXPECT_EQ(ai->get_start_date(), "2019-12-06");
-	EXPECT_EQ(ai->get_action_text(), "Here be an action!");
+	string action_text = "Here be an action!";
+	action_text.append(LINE_RETURN);
+	action_text.append(LINE_RETURN);
+	action_text.append(LINE_RETURN);
+	EXPECT_EQ(ai->get_action_text(), action_text);
 	EXPECT_EQ(ai->get_notes().size(), 2);
 	EXPECT_EQ(ai->get_notes().front(), "2019-12-07 I did stuff");
 	EXPECT_EQ(ai->get_notes().back(), "2019-12-08 I thought about doing stuff");

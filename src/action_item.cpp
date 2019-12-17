@@ -116,7 +116,12 @@ action_item* action_item::get_action_item(string line, ifstream* stream, meeting
 #ifdef DEBUG
 			cout << "Line of action: " << line << endl;
 #endif
+			if (curr_ai_text.size() != 0) {
+				curr_ai_text.append(LINE_RETURN);
+			}
+
 			curr_ai_text.append(line);
+			
 		}
 		else {
 			//I need to have this for making notes multi-line. TODO, add support for multilines

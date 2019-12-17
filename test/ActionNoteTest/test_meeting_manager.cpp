@@ -50,17 +50,20 @@ TEST(meeting_manager, DoesLoadOpenActions) {
 	action_item* first = open_actions.at(0);
 	ASSERT_EQ(first->get_closed_date().size(), 0);
 	ASSERT_EQ(first->get_notes().size(), 0);
-	ASSERT_EQ(first->get_action_text(), "TAKE RANDOM ACTION");
+	string action_text = "TAKE RANDOM ACTION";
+	ASSERT_EQ(first->get_action_text(), action_text);
 	
 	action_item* second = open_actions.at(1);
 	ASSERT_EQ(second->get_closed_date().size(), 0);
 	ASSERT_EQ(second->get_notes().size(), 2);
-	ASSERT_EQ(second->get_action_text(), "This is a followup action");
+	action_text = "This is a followup action";
+	ASSERT_EQ(second->get_action_text(), action_text);
 	
 	action_item* third = open_actions.at(2);
 	ASSERT_EQ(third->get_closed_date().size(), 0);
 	ASSERT_EQ(third->get_notes().size(), 0);
-	ASSERT_EQ(third->get_action_text(), "TAKE RANDOM ACTION");
+	action_text = "TAKE RANDOM ACTION";
+	ASSERT_EQ(third->get_action_text(), action_text);
 	
 }
 
@@ -75,7 +78,8 @@ TEST(meeting_manager, DoesLoadOpenActionsFromActionNotes) {
 	ASSERT_EQ(first->get_notes().size(), 2);
 	ASSERT_EQ(first->get_notes().front(), "2019-12-07 I did stuff");
 	ASSERT_EQ(first->get_notes().back(), "2019-12-08 I thought about doing stuff");
-	ASSERT_EQ(first->get_action_text(), "Here be an action!");
+	string action_text = "Here be an action!";
+	ASSERT_EQ(first->get_action_text(), action_text);
 }
 
 TEST(meeting_manager, DoesWriteBackActionNote) {
