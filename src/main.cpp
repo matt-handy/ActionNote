@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 
+using namespace handy::common;
 using namespace handy::action_note;
 using namespace std;
 

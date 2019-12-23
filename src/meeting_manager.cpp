@@ -3,12 +3,13 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <jstring.h>
+#include "jstring.h"
 #include <filesystem>
 #include <time.h>
 
 using namespace std;
 using namespace handy::action_note;
+using namespace handy::common;
 namespace fs = std::filesystem;
 
 bool meeting_manager::saveas_meeting(string meeting_name, meeting* meeting) {

@@ -6,6 +6,7 @@
 #include <jstring.h>
 
 using namespace handy;
+using namespace handy::common;
 using namespace handy::action_note;
 
 void meeting::to_file(string filename) {

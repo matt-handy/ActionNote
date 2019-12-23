@@ -7,6 +7,7 @@
 
 using namespace std;
 using namespace handy::action_note;
+using namespace handy::common;
 
 bool action_item::save_as(string filename) {
 	ofstream myfile;

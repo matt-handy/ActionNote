@@ -8,6 +8,7 @@
 
 
 using namespace std;
+using namespace handy::common;
 
 namespace handy{
 	namespace action_note{
@@ -61,7 +62,7 @@ namespace handy{
 			virtual string render_text();
 
 			inline void close_action() {
-				closed_date = timeutil::get_YYYYMMDD_current();
+				closed_date = handy::common::timeutil::get_YYYYMMDD_current();
 			}
 
 			inline void set_filename(string filename) {

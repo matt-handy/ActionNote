@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "../../include/meeting_manager.h"
-#include "../../include/timeutil.h"
+#include "timeutil.h"
 #include <filesystem>
 
 using namespace handy::action_note;

@@ -1,11 +1,12 @@
 #include "gtest/gtest.h"
 #include "../../include/action_item.h"
-#include "../../include/jstring.h"
+#include "jstring.h"
 
 #include <fstream>
 #include <filesystem>
 
 using namespace handy::action_note;
+using namespace handy::common;
 
 TEST(action_item, TestObjectSetup) {
 	action_item test_ai = action_item("myself", "12/14/2019", "12/15/2019", "DO ALL OF THE THINGS", "", NULL);
