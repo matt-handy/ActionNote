@@ -13,8 +13,9 @@ namespace handy {
 
 		class meeting_manager {
 		public:
-			meeting_manager(string directory) {
+			meeting_manager(string directory, uint8_t* key = NULL) {
 				dir = directory;
+				e_key = key;
 			}
 
 			~meeting_manager() {
@@ -40,6 +41,7 @@ namespace handy {
 			bool saveas_meeting(string meeting_name, meeting* meeting);
 		private:
 			string dir;
+			uint8_t* e_key;
 
 			vector<meeting*> meetings;
 			vector<action_item*> free_actions;

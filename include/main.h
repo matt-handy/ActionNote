@@ -14,14 +14,12 @@ using namespace std;
 namespace handy{
 	namespace action_note{
 
-		
-
 		class runner{
 		private:
 			
 
 		public:
-			void loop(istream &in, ostream& out, string dir);
+			void loop(istream &in, ostream& out, string dir, uint8_t *key = NULL);
 
 			bool pull_action(string& actionee, string& mnemonic, string& due_date, string& start_date, string& text, istream &in, ostream &out);
 		};

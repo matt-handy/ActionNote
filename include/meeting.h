@@ -12,8 +12,8 @@ namespace handy{
 
 		class meeting {
 		public: 
-			void to_file(string filename);
-			static meeting* from_file(string filename);
+			void to_file(string filename, uint8_t* key = NULL);
+			static meeting* from_file(string filename, uint8_t* key = NULL);
 
 			inline void add_attendee(string name) {
 				attendees.push_back(name);
@@ -41,6 +41,8 @@ namespace handy{
 			list<meeting_element *> elements;
 			list<action_item*> actions;
 			string original_file;
+
+			static meeting* meeting::from_file(istream* input, meeting* meeting);
 		};
 
 		class meeting_text : virtual public meeting_element {

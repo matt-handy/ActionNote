@@ -1,4 +1,5 @@
 #include "main.h"
+#include "aes.hpp"
 
 #include <iostream>
 #include <string>
@@ -49,7 +50,7 @@ bool runner::pull_action(string& actionee, string& mnemonic, string& due_date, s
 		start_date = line;
 	}
 
-	out << "Enter the action" << endl;
+	out << "Enter the action ('done' to close wizard)" << endl;
 	bool in_text = true;
 	while (in_text) {
 		getline(in, line);
@@ -66,12 +67,13 @@ bool runner::pull_action(string& actionee, string& mnemonic, string& due_date, s
 
 		}
 	}
+	
 	return true;
 }
 
-void runner::loop(istream& in, ostream& out, string dir) {
+void runner::loop(istream& in, ostream& out, string dir, uint8_t* key) {
 	bool stay_alive = true;
-	meeting_manager my_man(dir);
+	meeting_manager my_man(dir, key);
 	my_man.initialize();
 
 	while (stay_alive) {
@@ -128,6 +130,7 @@ void runner::loop(istream& in, ostream& out, string dir) {
 			
 			if (pull_action(actionee, mnemonic, due_date, start_date, text, in, out)) {
 				my_man.create_action_note(mnemonic, "myself", due_date, start_date, text);
+				out << "Action written!" << endl;
 			}
 		}
 		else if (line.find("minutes") != string::npos) {

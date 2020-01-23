@@ -135,7 +135,7 @@ TEST(runner, DoesQuickActionWork) {
 	EXPECT_TRUE(getline(r_is, line));
 	EXPECT_EQ(line, "Start Date?");
 	EXPECT_TRUE(getline(r_is, line));
-	EXPECT_EQ(line, "Enter the action");
+	EXPECT_EQ(line, "Enter the action ('done' to close wizard)");
 }
 
 TEST(runner, DoesMinuteWithAction) {
@@ -220,7 +220,7 @@ TEST(runner, DoesMinuteWithAction) {
 	EXPECT_TRUE(getline(r_is, line));
 	EXPECT_EQ(line, "Start Date?");
 	EXPECT_TRUE(getline(r_is, line));
-	EXPECT_EQ(line, "Enter the action");
+	EXPECT_EQ(line, "Enter the action ('done' to close wizard)");
 	EXPECT_TRUE(getline(r_is, line));
 	EXPECT_EQ(line, "Action saved");
 	EXPECT_TRUE(getline(r_is, line));

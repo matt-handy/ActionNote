@@ -104,18 +104,22 @@ TEST(meeting_manager, DoesWriteBackActionNote) {
 
 TEST(meeting_manager, DoesCreateNewActionNote) {
 	string basedir = "C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\meeting_manager";
-	meeting_manager my_man(basedir);
-	my_man.initialize();
-	my_man.create_action_note("test_creator", "myself", "2019-12-12", "2019-12-08", "This is an action I'm creating to testing stuff");
-
 	string newFileName = basedir;
 	newFileName.append(PATH_SEP);
 	newFileName.append("test_creator");
 	newFileName.append(timeutil::get_YYYYMMDD_current());
 	newFileName.append(".note");
 
+	if (filesystem::exists(newFileName)) {
+		std::filesystem::remove(newFileName);
+	}
+
+	meeting_manager my_man(basedir);
+	my_man.initialize();
+	my_man.create_action_note("test_creator", "myself", "2019-12-12", "2019-12-08", "This is an action I'm creating to testing stuff");
+
 	EXPECT_TRUE(filesystem::exists(newFileName));
-	EXPECT_TRUE(my_man.get_open_actions().size() == 4);
+	EXPECT_EQ(my_man.get_open_actions().size(), 4);
 
 	std::filesystem::remove(newFileName);
 }

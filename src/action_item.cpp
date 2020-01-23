@@ -1,6 +1,6 @@
 #include "action_item.h"
 #include "jstring.h"
-
+#include "aes.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -9,20 +9,47 @@ using namespace std;
 using namespace handy::action_note;
 using namespace handy::common;
 
-bool action_item::save_as(string filename) {
-	ofstream myfile;
-	myfile.open(filename);
 
-	myfile << render_text();
+bool action_item::save_as(string filename, uint8_t* key) {
+	string action_content = render_text();
+	if (key) {
+		struct AES_ctx ctx;
 
-	myfile.close();
+		size_t len = action_content.length() + 1; //Figure out how much data I have
+		size_t delta = 16 - (len % 16); //figure out how much more data I need to get to X * 16
+		len += delta; //Round up buffer to nearest 16th
+		unsigned char* workingBuff = new unsigned char[len];
+		memset(workingBuff, 0, len);
+		memcpy(workingBuff, action_content.c_str(), action_content.length());
+
+		AES_init_ctx_iv(&ctx, key, handy::action_note::iv);
+#ifdef DEBUG
+		cout << "Encrypting: " << len << endl;
+#endif
+		AES_CBC_encrypt_buffer(&ctx, (uint8_t*)workingBuff, len);
+#ifdef DEBUG
+		cout << "Writing to file: " << filename << endl;
+#endif
+
+		std::ofstream file(filename, std::ios::binary);
+		file.write((const char*)workingBuff, len);
+		file.close();
+		delete[] workingBuff;
+	}
+	else {
+		ofstream diskfile;
+		diskfile.open(filename);
+		diskfile << action_content;
+		diskfile.close();
+	}
+
 	file = filename;
 	return true;
 }
 
-bool action_item::save() {
+bool action_item::save(uint8_t* key) {
 	if (file.size() != 0) {
-		save_as(file);
+		save_as(file, key);
 		return true;
 	}
 	else {
@@ -30,26 +57,60 @@ bool action_item::save() {
 	}
 }
 
-action_item* action_item::get_action_item(string filename) {
-	ifstream myfile(filename);
+action_item* action_item::get_action_item(string filename, uint8_t* key) {
 	string line;
 	action_item* ai = NULL;
+	istream* target_stream;
 
-	if (myfile.is_open())
-	{
-		if (getline(myfile, line)) {
-			ai = get_action_item(line, &myfile, NULL);
+	if (key == NULL) {
+		ifstream myfile(filename);
+		if (myfile.is_open())
+		{
+			target_stream = &myfile;
+			if (getline(*target_stream, line)) {
+				ai = get_action_item(line, target_stream, NULL);
+			}
 		}
+		else {
+			cout << "Unable to open file";
+			return NULL;
+		}
+
+		myfile.close();
+	}
+	else {
+		std::ifstream file(filename, std::ios::binary | std::ios::ate);
+		std::streamsize size = file.tellg();
+		file.seekg(0, std::ios::beg);
+		char* buffer = new char[size];
+		//cout << "reading into buffer: " << size << endl;
+		if (file.read(buffer, size))
+		{
+			struct AES_ctx ctx;
+			AES_init_ctx_iv(&ctx, key, iv);
+			AES_CBC_decrypt_buffer(&ctx, (uint8_t*)buffer, size);
+			//cout << "Decrypted:" << size << endl;
+			std::stringbuf ret_buffer;
+			std::ostream r_os(&ret_buffer);
+			std::istream r_is(&ret_buffer);
+
+			r_os << buffer;
+			target_stream = &r_is;
+			if (getline(*target_stream, line)) {
+				ai = get_action_item(line, target_stream, NULL);
+			}
+		}
+		file.close();
+		delete[] buffer;
 	}
 
-	myfile.close();
 	if (ai != NULL) {
 		ai->set_filename(filename);
 	}
 	return ai;
 }
 
-action_item* action_item::get_action_item(string line, ifstream* stream, meeting* parent) {
+action_item* action_item::get_action_item(string line, istream* stream, meeting* parent) {
 	string curr_ai_assignee;
 	string curr_ai_start;
 	string curr_ai_due;

@@ -13,6 +13,8 @@ using namespace handy::common;
 namespace handy{
 	namespace action_note{
 
+		const uint8_t iv[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
+
 		class meeting;
 
 		const string ACTION_TAG = "@@AI ";
@@ -32,6 +34,8 @@ namespace handy{
 			list<string> notes;
 			meeting* parent;
 			string file;
+
+			
 
 		public:
 			action_item(string a_assignee, string a_start_date, string a_due_date, string a_action_text, string a_closed_date, meeting* a_parent) {
@@ -53,11 +57,11 @@ namespace handy{
 				parent = other.parent;
 			}
 
-			static action_item* get_action_item(string first_line, ifstream* stream, meeting* parent);
-			static action_item* get_action_item(string filename);
+			static action_item* get_action_item(string filename, uint8_t* key = NULL);
+			static action_item* get_action_item(string first_line, istream* stream, meeting* parent);
 
-			bool save();
-			bool save_as(string filename);
+			bool save(uint8_t* key = NULL);
+			bool save_as(string filename, uint8_t* key = NULL);
 
 			virtual string render_text();
 

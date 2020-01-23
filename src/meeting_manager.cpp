@@ -19,7 +19,7 @@ bool meeting_manager::saveas_meeting(string meeting_name, meeting* meeting) {
 	filename.append(meeting_name);
 	filename.append(timestamp);
 	filename.append(".mt");
-	meeting->to_file(filename);
+	meeting->to_file(filename, e_key);
 
 	meetings.push_back(meeting);
 
@@ -33,14 +33,14 @@ void meeting_manager::initialize() {
 #ifdef DEBUG
 			cout << p.path().string() << endl;
 #endif
-			meeting* read_meeting = meeting::from_file(p.path().string());
+			meeting* read_meeting = meeting::from_file(p.path().string(), e_key);
 #ifdef DEBUG
 			cout << read_meeting << endl;
 #endif
 			meetings.push_back(read_meeting);
 		}
 		else if (p.path().extension().generic_string().find("note") != string::npos) {
-			action_item* ai = action_item::get_action_item(p.path().string());
+			action_item* ai = action_item::get_action_item(p.path().string(), e_key);
 			free_actions.push_back(ai);
 		}
 	}
@@ -94,7 +94,7 @@ vector<action_item*> meeting_manager::get_open_actions() {
 }
 
 void meeting_manager::save_meeting(meeting* meeting) {
-	meeting->to_file(meeting->get_original_file());
+	meeting->to_file(meeting->get_original_file(), e_key);
 }
 
 bool meeting_manager::save_action(action_item* action) {
@@ -118,13 +118,20 @@ bool meeting_manager::addActionNote(string note, int openActionIdx) {
 
 void meeting_manager::create_action_note(string mnemonic, string actionee, string due_date, string start_date, string note) {
 	
-
 	action_item* ai = new action_item(actionee, start_date, due_date, note, string(), NULL);
 	string newFileName = dir;
 	newFileName.append(PATH_SEP);
 	newFileName.append(mnemonic);
 	newFileName.append(timeutil::get_YYYYMMDD_current());
 	newFileName.append(".note");
-	ai->save_as(newFileName);
+	
+#ifdef DEBUG
+	if(e_key){
+		cout << "Saving action as: " << newFileName << "with key: " << e_key << endl;
+	}else{
+		cout << "Saving action as: " << newFileName << endl;
+	}
+#endif
+	ai->save_as(newFileName, e_key);
 	free_actions.push_back(ai);
 }
