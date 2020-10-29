@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
 	if (argc == 1) {
 		my_main.loop(cin, cout, "thisdir");
 	}
-	else if (argc = 2) {
+	else if (argc == 2) {
 		my_main.loop(cin, cout, "thisdir", (uint8_t*)argv[1]);
 	}
 	else {

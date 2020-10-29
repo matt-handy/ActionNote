@@ -9,7 +9,7 @@ include_directories(../Common/tiny-AES-c)
 file(GLOB SOURCES "src/*.cpp")
 
 add_executable(action_note ${SOURCES} ../Common/tiny-AES-c/aes.c)
-add_library(lib_action_note STATIC src/action_item.cpp src/main.cpp src/meeting.cpp src/meeting_manager.cpp ../Common/tiny-AES-c/aes.c)
+add_library(lib_action_note STATIC src/action_item.cpp src/main.cpp src/meeting.cpp src/meeting_manager.cpp src/dossier.cpp src/dossier_manager.cpp ../Common/tiny-AES-c/aes.c)
 
 find_library(CPPCOMMON_LIB cpp_common HINTS lib)
 target_link_libraries (action_note ${CPPCOMMON_LIB})

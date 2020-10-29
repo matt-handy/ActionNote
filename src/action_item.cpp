@@ -72,7 +72,7 @@ action_item* action_item::get_action_item(string filename, uint8_t* key) {
 			}
 		}
 		else {
-			cout << "Unable to open file";
+			cout << "Unable to open action item file";
 			return NULL;
 		}
 

@@ -5,6 +5,31 @@
 namespace fs = std::filesystem;
 using namespace handy::action_note;
 
+TEST(runner, DoesDossierInterationWork) {
+	std::stringbuf buffer;
+	std::ostream os(&buffer);
+	std::istream is(&buffer);
+	os << "dossier" << endl;
+	os << "ld" << endl;
+	os << "quit" << endl;
+	os << "quit" << endl;
+
+	std::stringbuf ret_buffer;
+	std::ostream r_os(&ret_buffer);
+	std::istream r_is(&ret_buffer);
+
+	string dir = "C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\runner_test";
+	runner my_main;
+	my_main.loop(is, r_os, dir);
+
+	string line;
+	EXPECT_TRUE(getline(r_is, line));
+	EXPECT_EQ(line, "Entering Dossier system, enter 'quit' to return");
+	ASSERT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "1 : Gary Human");
+	EXPECT_FALSE(getline(r_is, line));
+}
+
 TEST(runner, DoesBasicMeetingWork) {
 	std::stringbuf buffer;
 	std::ostream os(&buffer);
@@ -57,7 +82,8 @@ TEST(runner, DoesBasicMeetingWork) {
 			FAIL("No notes should be present");
 		}
 	}
-	EXPECT_TRUE(fileCount == 1);
+	//Expect dossier directory
+	EXPECT_TRUE(fileCount == 2);
 
 	string line;
 	EXPECT_TRUE(getline(r_is, line));
@@ -123,7 +149,8 @@ TEST(runner, DoesQuickActionWork) {
 			EXPECT_TRUE(remove(p.path()));
 		}
 	}
-	EXPECT_TRUE(fileCount == 1);
+	//Expect dossier directory
+	EXPECT_TRUE(fileCount == 2);
 
 	string line;
 	EXPECT_TRUE(getline(r_is, line));
@@ -200,7 +227,8 @@ TEST(runner, DoesMinuteWithAction) {
 			FAIL("No notes should be present");
 		}
 	}
-	EXPECT_TRUE(fileCount == 1);
+	//Expect dossier directory
+	EXPECT_TRUE(fileCount == 2);
 
 	string line;
 	EXPECT_TRUE(getline(r_is, line));

@@ -50,6 +50,7 @@ void meeting::to_file(string filename, uint8_t* key) {
 		memset(workingBuff, 0, len);
 		memcpy(workingBuff, testString.c_str(), testString.length());
 
+		//TODO: Create a more secure IV
 		AES_init_ctx_iv(&ctx, key, handy::action_note::iv);
 #ifdef DEBUG
 		cout << "Encrypting: " << len << endl;

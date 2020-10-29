@@ -1,4 +1,5 @@
 #include "main.h"
+#include "dossier_manager.h"
 #include "aes.hpp"
 
 #include <iostream>
@@ -81,6 +82,15 @@ void runner::loop(istream& in, ostream& out, string dir, uint8_t* key) {
 		getline(in, line);
 		if (line.find("quit") != string::npos) {
 			stay_alive = false;
+		}
+		else if (line.find("dossier") != string::npos) {
+			string targetFolder = dir;
+			targetFolder.append("\\");
+			targetFolder.append("dossier");
+			dossier_manager d_manager(targetFolder, key);
+			d_manager.initialize();
+			out << "Entering Dossier system, enter 'quit' to return" << endl;
+			d_manager.ui_loop(in, out);
 		}
 		else if (line.find("oas") != string::npos || line.find("openactions") != string::npos) {
 			vector<action_item*> open_actions = my_man.get_open_actions();
