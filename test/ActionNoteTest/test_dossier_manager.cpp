@@ -93,6 +93,205 @@ TEST(dossier_manager, DoesEditDossierUnencrypted) {
 	std::filesystem::remove("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\unencrypted_dossier_scratch\\00003.txt");
 }
 
+TEST(dossier_manager, DoesUpdateContactCorrectly) {
+	std::filesystem::copy("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\unencrypted_dossier_master",
+		"C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\unencrypted_dossier_scratch");
+
+	dossier_manager manager("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\unencrypted_dossier_scratch");
+	manager.initialize();
+
+	std::stringbuf buffer;
+	std::ostream os(&buffer);
+	std::istream is(&buffer);
+	//Confirm dossier 1 has no contact info and this renders correctly.
+	os << "od 1" << endl;
+	
+	//Add an address
+	os << "uaddr" << endl;
+	os << "123 Nowhere Dr" << endl;
+	os << "City, CA, 20000" << endl;
+	os << "<done>" << endl;
+
+	//dump and confirm address set
+	os << "od 1" << endl;
+
+	//Add another address
+	os << "uaddr" << endl;
+	os << "234 Nowhere Dr" << endl;
+	os << "Elsewhere, CA, 20000" << endl;
+	os << "<done>" << endl;
+	
+	//confirm address updated and old one in old info
+	os << "od 1" << endl;
+	
+	//add a phone number
+	os << "aphone 123-456-7890" << endl;
+	//add an email
+	os << "aemail gary@human.com" << endl;
+	//confirm they are added
+	os << "od 1" << endl;
+
+	//remove phone number
+	os << "rphone 123-456-7890" << endl;
+	//remove email
+	os << "remail gary@human.com" << endl;
+	//confirm they are removed
+	os << "od 1" << endl;
+	os << "quit" << endl;
+
+	std::stringbuf ret_buffer;
+	std::ostream r_os(&ret_buffer);
+	std::istream r_is(&ret_buffer);
+	manager.ui_loop(is, r_os);
+
+	//Confirm dossier 1 has no contact info and this renders correctly.
+	string line;
+	ASSERT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "First Name: Gary");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Middle Name(s): The");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Last Name: Human");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "DOB: 10/10/1896");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Gary is a very old human. ");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "");
+
+	//Add an address, confirm address is listed
+	//Enter address. '<done>' to complete entry.
+	ASSERT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Enter address. '<done>' to complete entry.");
+	ASSERT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "First Name: Gary");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Middle Name(s): The");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Last Name: Human");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "DOB: 10/10/1896");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Current Address: ");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "123 Nowhere Dr");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "City, CA, 20000");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Gary is a very old human. ");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "");
+
+	//Update address
+	ASSERT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Enter address. '<done>' to complete entry.");
+	ASSERT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "First Name: Gary");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Middle Name(s): The");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Last Name: Human");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "DOB: 10/10/1896");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Current Address: ");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "234 Nowhere Dr");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Elsewhere, CA, 20000");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Gary is a very old human. ");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Address updated, prior address");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "123 Nowhere Dr");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "City, CA, 20000");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "");
+
+	//Confirm email and phone are added
+	ASSERT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "First Name: Gary");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Middle Name(s): The");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Last Name: Human");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "DOB: 10/10/1896");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Current Address: ");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "234 Nowhere Dr");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Elsewhere, CA, 20000");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Phone Numbers:");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "123-456-7890");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Email Addresses:");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "gary@human.com");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Gary is a very old human. ");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Address updated, prior address");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "123 Nowhere Dr");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "City, CA, 20000");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "");
+
+	//Make sure email and phone numbers were removed
+	ASSERT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "First Name: Gary");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Middle Name(s): The");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Last Name: Human");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "DOB: 10/10/1896");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Current Address: ");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "234 Nowhere Dr");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Elsewhere, CA, 20000");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Gary is a very old human. ");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "Address updated, prior address");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "123 Nowhere Dr");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "City, CA, 20000");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "");
+	EXPECT_TRUE(getline(r_is, line));
+	ASSERT_EQ(line, "");
+
+	std::filesystem::remove("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\unencrypted_dossier_scratch\\00001.txt");
+	std::filesystem::remove("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\unencrypted_dossier_scratch\\00003.txt");
+}
+
 TEST(dossier_manager, AddDossier) {
 	std::filesystem::copy("C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\unencrypted_dossier_master",
 		"C:\\Users\\matte\\OneDrive\\Documents\\Software\\ActionNote\\test\\unencrypted_dossier_scratch");

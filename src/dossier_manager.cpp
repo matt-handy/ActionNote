@@ -141,6 +141,78 @@ void dossier_manager::ui_loop(istream& in, ostream& out) {
 
 			update_state();
 		}
+		else if (line.find("uaddr") != string::npos || line.find("updateaddress") != string::npos) {
+			if (!active_dossier) {
+				out << "Need to choose a dossier to open first" << endl;
+				continue;
+			}
+			out << "Enter address. '<done>' to complete entry." << endl;
+			getline(in, line);
+			std::stringstream info;
+			while (line.find("<done>") == string::npos) {
+				info << line << LINE_RETURN;
+				getline(in, line);
+			}
+			current_dossier.update_current_addr(info.str());
+
+			update_state();
+		}
+		else if (line.find("aphone") != string::npos || line.find("addphone") != string::npos) {
+			vector<jstring> elements = jstring(line.c_str()).split(" ");
+			if (elements.size() < 2) {
+				out << "addphone <new phone number>" << endl;
+				continue;
+			}
+			if (active_dossier) {
+				current_dossier.add_phone_number(elements.at(1).c_str());
+				update_state();
+			}
+			else {
+				out << "Need to choose a dossier to open first" << endl;
+			}
+		}
+		else if (line.find("rphone") != string::npos || line.find("removephone") != string::npos) {
+			vector<jstring> elements = jstring(line.c_str()).split(" ");
+			if (elements.size() < 2) {
+				out << "remove <old phone number>" << endl;
+				continue;
+			}
+			if (active_dossier) {
+				current_dossier.remove_phone_number(elements.at(1).c_str());
+				update_state();
+			}
+			else {
+				out << "Need to choose a dossier to open first" << endl;
+			}
+		}
+		else if (line.find("aemail") != string::npos || line.find("addemail") != string::npos) {
+			vector<jstring> elements = jstring(line.c_str()).split(" ");
+			if (elements.size() < 2) {
+				out << "addemail <new email number>" << endl;
+				continue;
+			}
+			if (active_dossier) {
+				current_dossier.add_email_addr(elements.at(1).c_str());
+				update_state();
+			}
+			else {
+				out << "Need to choose a dossier to open first" << endl;
+			}
+		}
+		else if (line.find("remail") != string::npos || line.find("removeemail") != string::npos) {
+			vector<jstring> elements = jstring(line.c_str()).split(" ");
+			if (elements.size() < 2) {
+				out << "remove <old email>" << endl;
+				continue;
+			}
+			if (active_dossier) {
+				current_dossier.remove_email_addr(elements.at(1).c_str());
+				update_state();
+			}
+			else {
+				out << "Need to choose a dossier to open first" << endl;
+			}
+		}
 		else if (line.find("add") != string::npos || line.find("adddossier") != string::npos) {
 			dossier new_dossier;
 			out << "First name?: " << endl;
@@ -238,6 +310,11 @@ void dossier_manager::ui_loop(istream& in, ostream& out) {
 			out << "add/adddossier: launches the add dossier wizard" << endl;
 			out << "exd/exportdossier: Exports the dossier to file system for manual edits" << endl;
 			out << "imp/importdossier: Imports dossier back from filesystem" << endl;
+			out << "uaddr/updateaddress: Updates address and logs old address in 'information'" << endl;
+			out << "aphone/addphone: Adds a contact phone number" << endl;
+			out << "rphone/removephone: Removes a contact phone number" << endl;
+			out << "aemail/addemail: Adds a contact email" << endl;
+			out << "remail/removeemail: Removes a contact email" << endl;
 		}
 	}
 }

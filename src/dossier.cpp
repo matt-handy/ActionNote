@@ -17,9 +17,65 @@ void dossier::set_idx(int v_idx) {
 	filename = filename_builder.str();
 }
 
+void dossier::update_current_addr(std::string address) {
+	if (current_addr.find("N/A") != string::npos || current_addr.size() != 0) {
+		string addr_note = "Address updated, prior address";
+		addr_note.append(LINE_RETURN);
+		addr_note.append(current_addr);
+		append_information(addr_note);
+	}
+	current_addr = address;
+}
+
+void dossier::remove_phone_number(string number) {
+	list<string>::iterator a_iter = phone_numbers.begin();
+	while (a_iter != phone_numbers.end()) {
+		if ((*a_iter).find(number) != string::npos) {
+			phone_numbers.erase(a_iter);
+			break;
+		}
+		advance(a_iter, 1);
+	}
+}
+
+void dossier::remove_email_addr(string number) {
+	list<string>::iterator a_iter = email_addrs.begin();
+	while (a_iter != email_addrs.end()) {
+		if ((*a_iter).find(number) != string::npos) {
+			email_addrs.erase(a_iter);
+			break;
+		}
+		advance(a_iter, 1);
+	}
+}
+
 void dossier::append_information(std::string new_info) {
 	information.append(new_info);
 	information.append(LINE_RETURN);
+}
+
+string dossier::dump_phone_numbers() {
+	string output = PHONE_NUMBERS;
+	output.append(LINE_RETURN);
+	list<string>::iterator a_iter = phone_numbers.begin();
+	while (a_iter != phone_numbers.end()) {
+		output.append(*a_iter);
+		output.append(LINE_RETURN);
+		advance(a_iter, 1);
+	}
+	return output;
+}
+
+string dossier::dump_email_addrs() {
+	string output = EMAIL_ADDRESSES;
+	output.append(LINE_RETURN);
+	list<string>::iterator a_iter = email_addrs.begin();
+	while (a_iter != email_addrs.end()) {
+		output.append(*a_iter);
+		output.append(LINE_RETURN);
+		advance(a_iter, 1);
+	}
+	return output;
 }
 
 string dossier::to_string() {
@@ -28,6 +84,18 @@ string dossier::to_string() {
 	myfile << MIDDLE_NAMES << middle_names << LINE_RETURN;
 	myfile << LAST_NAME << last_name << LINE_RETURN;
 	myfile << DOB << dob << LINE_RETURN;
+	
+	if (current_addr.size() > 0) {
+		myfile << CURRENT_ADDRESS << LINE_RETURN;
+		myfile << current_addr << LINE_RETURN;//This should result in a line break at the end
+	}
+	if (phone_numbers.size() > 0) {
+		myfile << dump_phone_numbers() << LINE_RETURN;//This should result in a line break at the end
+	}
+	if (email_addrs.size() > 0) {
+		myfile << dump_email_addrs() << LINE_RETURN;//This should result in a line break at the end
+	}
+
 	myfile << information;
 	return myfile.str();
 }
@@ -88,8 +156,73 @@ void dossier::from_file(istream* input, dossier& dossier) {
 	getline(*input, line);
 	string dob = line.substr(DOB.length());
 	dossier.update_dob(dob);
+	//Addresses
+	getline(*input, line);
+	bool used_last_line = false;
+	if (line.find(CURRENT_ADDRESS) != string::npos) {
+		bool in_addr = true;
+		string address = "";
+		while (in_addr) {
+			getline(*input, line);
+			if (line.size() != 0) {
+				address.append(line);
+				address.append(LINE_RETURN);
+			}
+			else {
+				in_addr = false;
+			}
+		}
+		dossier.update_current_addr(address);
+		used_last_line = true;
+	}
+	else {
+		used_last_line = false;
+	}
+	//Phone Numbers
+	if (used_last_line) {
+		getline(*input, line);
+	}
+	if (line.find(PHONE_NUMBERS) != string::npos) {
+		bool in_numbers = true;
+		while (in_numbers) {
+			getline(*input, line);
+			if (line.size() != 0) {
+				dossier.add_phone_number(line);
+			}
+			else {
+				in_numbers = false;
+			}
+		}
+		used_last_line = true;
+	}
+	else {
+		used_last_line = false;
+	}
+	//Email
+	if (used_last_line) {
+		getline(*input, line);
+	}
+	if (line.find(EMAIL_ADDRESSES) != string::npos) {
+		bool in_email = true;
+		while (in_email) {
+			getline(*input, line);
+			if (line.size() != 0) {
+				dossier.add_email_addr(line);
+			}
+			else {
+				in_email = false;
+			}
+		}
+		used_last_line = true;
+	}
+	else {
+		used_last_line = false;
+	}
 
 	std::stringstream information;
+	if (!used_last_line) {
+		information << line << LINE_RETURN;
+	}
 	while (getline(*input, line))
 	{
 		information << line << LINE_RETURN;

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <string>;
+#include <string>
+#include <list>
 
 #include "meeting_element.h"
 
@@ -11,6 +12,9 @@ namespace handy {
 		const std::string LAST_NAME = "Last Name: ";
 		const std::string MIDDLE_NAMES = "Middle Name(s): ";
 		const std::string DOB = "DOB: ";
+		const std::string PHONE_NUMBERS = "Phone Numbers:";
+		const std::string EMAIL_ADDRESSES = "Email Addresses:";
+		const std::string CURRENT_ADDRESS = "Current Address: ";
 
 		class dossier {
 		private:
@@ -24,6 +28,10 @@ namespace handy {
 
 			int idx;
 			std::string filename;
+
+			std::string current_addr;
+			list<string> phone_numbers;
+			list<string> email_addrs;
 
 			static void from_file(istream* input, dossier& dossier);
 		public:
@@ -92,6 +100,28 @@ namespace handy {
 			void set_information(std::string v_information) {
 				information = v_information;
 			}
+
+			void update_current_addr(std::string address);
+
+			string get_current_addr() {
+				return current_addr;
+			}
+
+			void add_phone_number(string number) {
+				phone_numbers.push_back(number);
+			}
+
+			void remove_phone_number(string number);
+
+			string dump_phone_numbers();
+
+			void add_email_addr(string email) {
+				email_addrs.push_back(email);
+			}
+
+			void remove_email_addr(string number);
+
+			string dump_email_addrs();
 
 			void to_file(std::string filename, uint8_t* key);
 
